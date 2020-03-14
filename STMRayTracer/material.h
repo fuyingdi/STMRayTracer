@@ -59,7 +59,7 @@ public:
 		return true;
 	}
 
-	vec3 albedo;    // 漫反射颜色
+	vec3 albedo; // 漫反射颜色
 };
 
 class Metal : public Material {

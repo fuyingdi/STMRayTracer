@@ -68,7 +68,7 @@ float hit_sphere(const vec3& center, float radius, const ray& r) {
     if (discriminant < 0) return -1;
     else return (-b - sqrt(discriminant)) / (2.0 * a);
 }
-int main()
+int _main()
 {
     int const xsize = 1000, ysize = 500;
     int const ns = 30;
@@ -81,13 +81,14 @@ int main()
     vec3 origin(0.0, 0.0, 0.0);
 
     Hitable* list[4];
-    list[0] = new sphere(vec3(0, 0, -1), 0.5, new Lambertian(vec3(0.3, 0.3, 0.3)));
-    list[1] = new sphere(vec3(0, -100.5, -1), 100, new Lambertian(vec3(0.0, 0.1, 0.0)));
-    list[2] = new sphere(vec3(1, 0, -1), 0.5, new Metal(vec3(0.8, 0.6, 0.2), 0.6));
-    list[3] = new sphere(vec3(-0.75, 0, -1), 0.35, new Metal(vec3(0.8, 0.8, 0.8), 0.9));
+    list[0] = new sphere(vec3( 0,      0, -1), 0.5,  new Lambertian(vec3(0.0, 0.3, 0.3)));
+    list[1] = new sphere(vec3( 0, -100.5, -1), 100,  new Lambertian(vec3(0.0, 0.1, 0.0)));
+    list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new      Metal(vec3(0.8, 0.6, 0.2), 0.6));
+    list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new      Metal(vec3(0.8, 0.8, 0.8), 0.9));
     Hitable* world = new HitableList(list, 4);
 
-    camera cam;
+    Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(1000) / float(500));
+
     FILE* fp = fopen("out.png", "wb");
     for (int j = ysize - 1; j >= 0; j--)
         for (int i = 0; i < xsize; i++) {
@@ -109,6 +110,6 @@ int main()
         }
     svpng(fp, xsize, ysize, rgb, 0);
     fclose(fp);
-
+    return 1;
 }
 
