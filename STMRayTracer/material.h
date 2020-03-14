@@ -65,8 +65,7 @@ public:
 class Metal : public Material {
 public:
 	Metal(const vec3& a, float f) : albedo(a) { if (f < 1)fuzz = f; else fuzz = 1; }
-	virtual bool scatter(const ray& r_in, const hit_record& rec,
-		vec3& attenuation, ray& scattered) const {
+	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const {
 		vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
 		scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
 		attenuation = albedo;
@@ -76,9 +75,10 @@ public:
 	float fuzz; // Ä£ºý¶È
 };
 
-class dielectric : public Material {
+// ¾øÔµÌå
+class Dielectric : public Material {
 public:
-	dielectric(float ri) : ref_idx(ri) {}
+	Dielectric(float ri) : ref_idx(ri) {}
 	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const {
 		vec3 outward_normal;
 		vec3 reflected = reflect(r_in.direction(), rec.normal);
