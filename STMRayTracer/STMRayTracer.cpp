@@ -1,11 +1,12 @@
 ﻿#include<iostream>
+#include<stdlib.h>
 #include"vec3.h"
 #include"ray.h"
 #include"sphere.h"
 #include"float.h"
-#include<stdlib.h>
 #include"camera.h"
 #include"svpng.inc"
+//#include"hitable_list.h"
 
 
 #define MAXFLOAT 100000
