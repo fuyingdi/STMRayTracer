@@ -4,13 +4,14 @@
 #include "hitable.h"
 #include "vec3.h"
 
-class sphere:public hitable{
+class sphere:public Hitable{
     public:
         sphere(){}
-        sphere(vec3 center, float radius):center(center),radius(radius){}
+        sphere(vec3 center, float radius, Material *m):center(center),radius(radius),mat_ptr(m){}
         virtual bool hit(const ray& r, float tmin, float tmax, hit_record& rec)const;
         vec3 center;
         float radius;
+        Material* mat_ptr;
 };
 bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec)const{
     vec3 oc = r.origin() - center;
@@ -24,6 +25,8 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec)const{
             rec.t = temp;
             rec.p = r.point_at_parameter(rec.t);
             rec.normal = (rec.p-center)/radius;
+
+            rec.mat_ptr = mat_ptr;
             return true;
         }
         temp = (-b + sqrt(b*b-a*c))/a;
@@ -31,6 +34,8 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec)const{
             rec.t = temp;
             rec.p = r.point_at_parameter(rec.t);
             rec.normal = (rec.p - center)/radius;
+            rec.mat_ptr = mat_ptr;
+
             return true;
         }
     }
