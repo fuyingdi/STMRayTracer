@@ -1,4 +1,9 @@
 ﻿#include<iostream>
+
+#include <SDL.h>
+#include <SDL_render.h>
+
+#include <vector>
 #include<stdlib.h>
 #include"vec3.h"
 #include"ray.h"
@@ -9,11 +14,15 @@
 #include"sphere.h"
 #include"material.h"
 
+using namespace std;
+
 
 #define MAXFLOAT 100000
 #define MRAND 0x100000000LL
 #define CRAND 0xB16
 #define ARAND 0x5DEECE66DLL
+
+#define RENDER_TO_PICTURE 0
 
 static unsigned long long seed = 1;
 
@@ -68,11 +77,49 @@ float hit_sphere(const vec3& center, float radius, const ray& r) {
     if (discriminant < 0) return -1;
     else return (-b - sqrt(discriminant)) / (2.0 * a);
 }
-int _main()
+int main(int argc, char** argv)
 {
+    SDL_Init(SDL_INIT_EVERYTHING);
+
+    SDL_Window* window = SDL_CreateWindow
+    (
+        "SDL2",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        1000, 500,
+        SDL_WINDOW_SHOWN
+    );
+
+    SDL_Renderer* renderer = SDL_CreateRenderer
+    (
+        window,
+        -1,
+        SDL_RENDERER_ACCELERATED
+    );
+
+    const int texWidth = 1000;
+    const int texHeight = 500;
+    SDL_Texture* texture = SDL_CreateTexture
+    (
+        renderer,
+        SDL_PIXELFORMAT_ARGB8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        texWidth, texHeight
+    );
+
+    //vector< unsigned char > pixels(texWidth * texHeight * 4, 0);
+
+    uint8_t pixels[texWidth * texHeight * 4];
+
+    SDL_Event event;
+    bool running = true;
+
+
+    ////////////////////
+
     int const xsize = 1000, ysize = 500;
-    int const ns = 30;
-    unsigned char rgb[xsize * ysize * 3], * p = rgb;
+    int const ns = 1;
+    uint8_t* p = pixels;
+    //unsigned char rgb[xsize * ysize * 3], * p = rgb;
     unsigned x, y;
 
     vec3 lower_left_corner(-2.0, -1.0, -1.0);
@@ -89,7 +136,6 @@ int _main()
 
     Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(1000) / float(500));
 
-    FILE* fp = fopen("out.png", "wb");
     for (int j = ysize - 1; j >= 0; j--)
         for (int i = 0; i < xsize; i++) {
             vec3 col = vec3(0, 0, 0);
@@ -101,15 +147,77 @@ int _main()
                 ray r = cam.get_ray(u, v);
                 vec3 _p = r.point_at_parameter(2.0);
                 col += color(r, world,0);
-            }
             col = col / float(ns);
+            }
             col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2])); // gamma 2
+
+            //*p++ = (unsigned char)(255 * col[0]);    /* R */
+            //*p++ = (unsigned char)(255 * col[1]);    /* G */
+            //*p++ = (unsigned char)(255 * col[2]);    /* B */
             *p++ = (unsigned char)(255 * col[0]);    /* R */
             *p++ = (unsigned char)(255 * col[1]);    /* G */
             *p++ = (unsigned char)(255 * col[2]);    /* B */
+            *p++ = (unsigned char)(255 * 1);    /* A */
         }
-    svpng(fp, xsize, ysize, rgb, 0);
-    fclose(fp);
+    if (RENDER_TO_PICTURE)
+    {
+        ;
+       /* FILE* fp = fopen("out.png", "wb");
+        svpng(fp, xsize, ysize, rgb, 0);
+        fclose(fp);*/
+    }
+    while (running)
+    {
+        const Uint64 start = SDL_GetPerformanceCounter();
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(renderer);
+
+        while (SDL_PollEvent(&event))
+        {
+            if ((SDL_QUIT == event.type) ||
+                (SDL_KEYDOWN == event.type && SDL_SCANCODE_ESCAPE == event.key.keysym.scancode))
+            {
+                running = false;
+                break;
+            }
+        }
+
+        // splat down some random pixels
+        //for (unsigned int i = 0; i < 1000; i++)
+        //{
+        //    const unsigned int x = rand() % texWidth;
+        //    const unsigned int y = rand() % texHeight;
+
+        //    const unsigned int offset = (texWidth * 4 * y) + x * 4;
+        //    pixels[offset + 0] = rand() % 256;        // b
+        //    pixels[offset + 1] = rand() % 256;        // g
+        //    pixels[offset + 2] = rand() % 256;        // r
+        //    pixels[offset + 3] = SDL_ALPHA_OPAQUE;    // a
+        //}
+
+        //unsigned char* lockedPixels;
+        //int pitch;
+        //SDL_LockTexture
+        //    (
+        //    texture,
+        //    NULL,
+        //    reinterpret_cast< void** >( &lockedPixels ),
+        //    &pitch
+        //    );
+        //std::copy( pixels.begin(), pixels.end(), lockedPixels );
+        //SDL_UnlockTexture( texture );
+
+        SDL_UpdateTexture(texture,NULL,&pixels[0],texWidth * 4);
+
+        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+
+        const Uint64 end = SDL_GetPerformanceCounter();
+        const static Uint64 freq = SDL_GetPerformanceFrequency();
+        const double seconds = (end - start) / static_cast<double>(freq);
+        cout << "Frame time: " << seconds * 1000.0 << "ms" << endl;
+    }
     return 1;
 }
 
