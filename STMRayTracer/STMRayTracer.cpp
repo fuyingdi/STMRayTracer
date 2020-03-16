@@ -5,6 +5,7 @@
 
 #include <vector>
 #include<stdlib.h>
+#include<Windows.h> // 之后换成pthread
 #include"vec3.h"
 #include"ray.h"
 #include"float.h"
@@ -22,9 +23,22 @@ using namespace std;
 #define CRAND 0xB16
 #define ARAND 0x5DEECE66DLL
 
-#define RENDER_TO_PICTURE 0
+#define RENDER_TO_PICTURE 1
 
 static unsigned long long seed = 1;
+SDL_Window* window;
+SDL_Texture* texture;
+SDL_Renderer* renderer;
+SDL_Thread* thread;
+SDL_Event event;
+
+const int texWidth = 1000;
+const int texHeight = 500;
+bool running = true;
+bool update_flag = false;
+
+uint8_t pixels[texWidth * texHeight * 4];
+
 
 double drand48(void)
 {
@@ -76,99 +90,21 @@ float hit_sphere(const vec3& center, float radius, const ray& r) {
     float discriminant = b * b - 4 * a * c;
     if (discriminant < 0) return -1;
     else return (-b - sqrt(discriminant)) / (2.0 * a);
+
 }
-int main(int argc, char** argv)
+
+static int update(void *ptr)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    SDL_Window* window = SDL_CreateWindow
-    (
-        "SDL2",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        1000, 500,
-        SDL_WINDOW_SHOWN
-    );
-
-    SDL_Renderer* renderer = SDL_CreateRenderer
-    (
-        window,
-        -1,
-        SDL_RENDERER_ACCELERATED
-    );
-
-    const int texWidth = 1000;
-    const int texHeight = 500;
-    SDL_Texture* texture = SDL_CreateTexture
-    (
-        renderer,
-        SDL_PIXELFORMAT_ARGB8888,
-        SDL_TEXTUREACCESS_STREAMING,
-        texWidth, texHeight
-    );
-
-    //vector< unsigned char > pixels(texWidth * texHeight * 4, 0);
-
-    uint8_t pixels[texWidth * texHeight * 4];
-
-    SDL_Event event;
-    bool running = true;
-
-
-    ////////////////////
-
-    int const xsize = 1000, ysize = 500;
-    int const ns = 1;
-    uint8_t* p = pixels;
-    //unsigned char rgb[xsize * ysize * 3], * p = rgb;
-    unsigned x, y;
-
-    vec3 lower_left_corner(-2.0, -1.0, -1.0);
-    vec3 horizontal(4.0, 0.0, 0.0);
-    vec3 vertical(0.0, 2.0, 0.0);
-    vec3 origin(0.0, 0.0, 0.0);
-
-    Hitable* list[4];
-    list[0] = new sphere(vec3( 0,      0, -1), 0.5,  new Lambertian(vec3(0.0, 0.3, 0.3)));
-    list[1] = new sphere(vec3( 0, -100.5, -1), 100,  new Lambertian(vec3(0.0, 0.1, 0.0)));
-    list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new      Metal(vec3(0.8, 0.6, 0.2), 0.6));
-    list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new      Metal(vec3(0.8, 0.8, 0.8), 0.9));
-    Hitable* world = new HitableList(list, 4);
-
-    Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(1000) / float(500));
-
-    for (int j = ysize - 1; j >= 0; j--)
-        for (int i = 0; i < xsize; i++) {
-            vec3 col = vec3(0, 0, 0);
-            for (int s = 0; s < ns; s++)
-            {
-                float u = float(i + drand48()) / float(xsize);
-                float v = float(j + drand48()) / float(ysize);
-                //ray r(origin, lower_left_corner +u*horizontal +v*vertical);
-                ray r = cam.get_ray(u, v);
-                vec3 _p = r.point_at_parameter(2.0);
-                col += color(r, world,0);
-            col = col / float(ns);
-            }
-            col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2])); // gamma 2
-
-            //*p++ = (unsigned char)(255 * col[0]);    /* R */
-            //*p++ = (unsigned char)(255 * col[1]);    /* G */
-            //*p++ = (unsigned char)(255 * col[2]);    /* B */
-            *p++ = (unsigned char)(255 * col[0]);    /* R */
-            *p++ = (unsigned char)(255 * col[1]);    /* G */
-            *p++ = (unsigned char)(255 * col[2]);    /* B */
-            *p++ = (unsigned char)(255 * 1);    /* A */
-        }
-    if (RENDER_TO_PICTURE)
+    window = SDL_CreateWindow("Render Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, texWidth, texHeight, SDL_WINDOW_SHOWN);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, texWidth, texHeight);
+    Uint64 start = SDL_GetPerformanceCounter();
+    while (1)
     {
-        ;
-       /* FILE* fp = fopen("out.png", "wb");
-        svpng(fp, xsize, ysize, rgb, 0);
-        fclose(fp);*/
-    }
-    while (running)
-    {
-        const Uint64 start = SDL_GetPerformanceCounter();
+        Sleep(16);
+        if (!update_flag)continue;
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
@@ -208,16 +144,86 @@ int main(int argc, char** argv)
         //std::copy( pixels.begin(), pixels.end(), lockedPixels );
         //SDL_UnlockTexture( texture );
 
-        SDL_UpdateTexture(texture,NULL,&pixels[0],texWidth * 4);
+        SDL_UpdateTexture(texture, NULL, &pixels[0], texWidth * 4);
 
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
         const Uint64 end = SDL_GetPerformanceCounter();
-        const static Uint64 freq = SDL_GetPerformanceFrequency();
+        const static Uint64 freq = 10000000;//SDL_GetPerformanceFrequency();
         const double seconds = (end - start) / static_cast<double>(freq);
-        cout << "Frame time: " << seconds * 1000.0 << "ms" << endl;
+        cout << "Frame time: " << seconds << "s" << endl;
+        start = SDL_GetPerformanceCounter(); 
+        update_flag = false;
     }
+    return 0;
+}
+
+
+int main(int argc, char** argv)
+{
+
+
+    thread = SDL_CreateThread(update, "render", (void*)NULL);
+    cout << thread;
+
+    //vector< unsigned char > pixels(texWidth * texHeight * 4, 0);
+
+    ////////////////////
+
+    int const xsize = texWidth, ysize = texHeight;
+    int const ns = 1;
+    int const nss = 100;
+    uint8_t* p = pixels;
+    //unsigned char rgb[xsize * ysize * 3], * p = rgb;
+    unsigned x, y;
+
+    vec3 lower_left_corner(-2.0, -1.0, -1.0);
+    vec3 horizontal(4.0, 0.0, 0.0);
+    vec3 vertical(0.0, 2.0, 0.0);
+    vec3 origin(0.0, 0.0, 0.0);
+
+    Hitable* list[4];
+    list[0] = new sphere(vec3( 0,      0, -1), 0.5,  new Lambertian(vec3(0.0, 0.3, 0.3)));
+    list[1] = new sphere(vec3( 0, -100.5, -1), 100,  new Lambertian(vec3(0.0, 0.1, 0.0)));
+    list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new      Metal(vec3(0.8, 0.6, 0.2), 0.6));
+    list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new      Metal(vec3(0.8, 0.8, 0.8), 0.9));
+    Hitable* world = new HitableList(list, 4);
+
+    Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(texWidth) / float(texHeight));
+
+    for (int ii = 0; ii < nss; ii++)
+    {
+        for (int j = ysize - 1; j >= 0; j--)
+            for (int i = 0; i < xsize; i++) {
+                vec3 col = vec3(0, 0, 0);
+                for (int s = 0; s < ns; s++)
+                {
+                    float u = float(i + drand48()) / float(xsize);
+                    float v = float(j + drand48()) / float(ysize);
+                    //ray r(origin, lower_left_corner +u*horizontal +v*vertical);
+                    ray r = cam.get_ray(u, v);
+                    vec3 _p = r.point_at_parameter(2.0);
+                    col += color(r, world,0);
+                }
+                col = col / float(ns);
+                col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2])); // gamma 2
+
+                const unsigned int offset = (texWidth * 4 * (texHeight-j)) + i * 4;
+                p[offset + 0] = (p[offset + 0] * ii + (unsigned char)(255 * col[2])) / (ii + 1);    /* R */
+                p[offset + 1] = (p[offset + 1] * ii + (unsigned char)(255 * col[1])) / (ii + 1);   /* G */
+                p[offset + 2] = (p[offset + 2] * ii + (unsigned char)(255 * col[0])) / (ii + 1);   /* B */
+                p[offset + 3] = 255;// (unsigned char)(255 * 1);         /* A */
+            }
+        update_flag = true;
+    }
+    if (RENDER_TO_PICTURE)
+    {
+        /*FILE* fp = fopen("out.png", "wb");
+        svpng(fp, xsize, ysize, pixels, 0);
+        fclose(fp);*/
+    }
+
     return 1;
 }
 
