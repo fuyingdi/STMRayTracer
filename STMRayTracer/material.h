@@ -4,6 +4,7 @@ struct hit_record;
 
 #include "ray.h"
 #include "hitable.h"
+#include "Texture.h"
 
 
 
@@ -56,15 +57,15 @@ public:
 
 class Lambertian : public Material {
 public:
-	Lambertian(const vec3& a) : albedo(a) {}
+	Lambertian(texture* a) : albedo(a) {}
 	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const {
 		vec3 target = rec.p + rec.normal + random_in_unit_sphere();
 		scattered = ray(rec.p, target - rec.p);
-		attenuation = albedo;
+		attenuation = albedo->value(rec.u, rec.v, rec.p);
 		return true;
 	}
 
-	vec3 albedo; // 漫反射颜色
+	texture* albedo; // 漫反射颜色
 };
 
 class Metal : public Material {
@@ -117,4 +118,18 @@ public:
 	}
 
 	float ref_idx;
+};
+
+// 自发光材质
+class DiffuseLight :public Material
+{
+public:
+	DiffuseLight(texture* a) :emit(a) {};
+	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered)const {
+		return false;
+	}
+	virtual vec3 emitted(float u, float v, const vec3& p)const {
+		return emit->value(u, v, p);
+	}
+	texture* emit;
 };

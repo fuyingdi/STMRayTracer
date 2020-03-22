@@ -14,7 +14,9 @@
 #include"hitable_list.h"
 #include"sphere.h"
 #include"material.h"
+#include"Rect.h"
 //#include"AABB.h"
+#include"Texture.h"
 
 
 using namespace std;
@@ -27,14 +29,14 @@ using namespace std;
 
 #define RENDER_TO_PICTURE 1
 
-static unsigned long long seed = 1;
+//static unsigned long long seed = 1;
 SDL_Window* window;
-SDL_Texture* texture;
+SDL_Texture* s_texture;
 SDL_Renderer* renderer;
 SDL_Thread* thread;
 SDL_Event event;
 
-const int texWidth = 1000;
+const int texWidth = 500;
 const int texHeight = 500;
 bool running = true;
 bool update_flag = false;
@@ -42,13 +44,13 @@ bool update_flag = false;
 uint8_t pixels[texWidth * texHeight * 4];
 
 
-double drand48(void)
-{
-    seed = (ARAND * seed + CRAND) & 0xFFFFFFFFFFFFLL;
-    unsigned int x = seed >> 16;
-    return 	((double)x / (double)MRAND);
-
-}
+double drand48(void);
+//{
+//    seed = (ARAND * seed + CRAND) & 0xFFFFFFFFFFFFLL;
+//    unsigned int x = seed >> 16;
+//    return 	((double)x / (double)MRAND);
+//
+//}
 
 float hit_sphere(const vec3& center, float radius, const ray& r);
 
@@ -101,7 +103,7 @@ static int update(void *ptr)
 
     window = SDL_CreateWindow("Render Test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, texWidth, texHeight, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, texWidth, texHeight);
+    s_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, texWidth, texHeight);
     Uint64 start = SDL_GetPerformanceCounter();
     while (1)
     {
@@ -146,9 +148,9 @@ static int update(void *ptr)
         //std::copy( pixels.begin(), pixels.end(), lockedPixels );
         //SDL_UnlockTexture( texture );
 
-        SDL_UpdateTexture(texture, NULL, &pixels[0], texWidth * 4);
+        SDL_UpdateTexture(s_texture, NULL, &pixels[0], texWidth * 4);
 
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderCopy(renderer, s_texture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
         const Uint64 end = SDL_GetPerformanceCounter();
@@ -161,7 +163,22 @@ static int update(void *ptr)
     return 0;
 }
 
+Hitable* cornell_box() {
+    Hitable** list = new Hitable * [8];
+    int i = 0;
+    Material* red = new Lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
+    Material* white = new Lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
+    Material* green = new Lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
+    Material* light = new DiffuseLight(new constant_texture(vec3(15, 15, 15)));
+    list[i++] = new flip_normals(new yz_rect(0, 555, 0, 555, 555, green));
+    list[i++] = new yz_rect(0, 555, 0, 555, 0, red);
+    list[i++] = new xz_rect(213, 343, 227, 332, 554, light);
+    list[i++] = new flip_normals(new xz_rect(0, 555, 0, 555, 555, white));
+    list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
+    list[i++] = new flip_normals(new xy_rect(0, 555, 0, 555, 555, white));
 
+    return new HitableList(list, i);
+}
 int main(int argc, char** argv)
 {
 
@@ -185,14 +202,20 @@ int main(int argc, char** argv)
     vec3 vertical(0.0, 2.0, 0.0);
     vec3 origin(0.0, 0.0, 0.0);
 
-    Hitable* list[4];
-    list[0] = new sphere(vec3( 0,      0, -1), 0.5,  new Lambertian(vec3(0.0, 0.3, 0.3)));
-    list[1] = new sphere(vec3( 0, -100.5, -1), 100,  new Lambertian(vec3(0.0, 0.1, 0.0)));
-    list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new Metal(vec3(0.8, 0.6, 0.2), 0.6));
-    list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new Metal(vec3(0.8, 0.8, 0.8), 0.9));
-    Hitable* world = new HitableList(list, 4);
-
-    Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(texWidth) / float(texHeight));
+    //Hitable* list[4];
+    //list[0] = new sphere(vec3( 0,      0, -1), 0.5,  new Lambertian(vec3(0.0, 0.3, 0.3)));
+    //list[1] = new sphere(vec3( 0, -100.5, -1), 100,  new Lambertian(vec3(0.0, 0.1, 0.0)));
+    //list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new Metal(vec3(0.8, 0.6, 0.2), 0.6));
+    //list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new Metal(vec3(0.8, 0.8, 0.8), 0.9));
+    Hitable* world = cornell_box();
+    
+    vec3 lookfrom(278, 278, -700);
+    vec3 lookat(278, 278, 0);
+    float dist_to_focus = 10.0;
+    float aperture = 0.1;
+    float vfov = 40.0;
+    Camera cam(lookfrom, lookat, vec3(0, 1, 0), vfov, float(xsize) / float(ysize));
+    //Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(texWidth) / float(texHeight));
 
     for (int ii = 0; ii < nss; ii++)
     {
