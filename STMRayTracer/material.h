@@ -46,6 +46,9 @@ public:
 	// 散射虚函数
 	// 参数：r_in 入射的光线， rec hit的记录， attenuation v3的衰减，scattered 散射后的光线
 	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const = 0;
+	// 非自发光材质，默认返回黑色
+	virtual vec3 emitted(float u, float v, const vec3& p)const { return vec3(0, 0, 0); };
+
 };
 
 
