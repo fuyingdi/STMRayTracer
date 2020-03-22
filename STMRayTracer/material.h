@@ -5,6 +5,8 @@ struct hit_record;
 #include "ray.h"
 #include "hitable.h"
 
+
+
 double drand48();
 
 

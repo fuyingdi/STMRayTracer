@@ -14,6 +14,8 @@
 #include"hitable_list.h"
 #include"sphere.h"
 #include"material.h"
+//#include"AABB.h"
+
 
 using namespace std;
 
@@ -186,8 +188,8 @@ int main(int argc, char** argv)
     Hitable* list[4];
     list[0] = new sphere(vec3( 0,      0, -1), 0.5,  new Lambertian(vec3(0.0, 0.3, 0.3)));
     list[1] = new sphere(vec3( 0, -100.5, -1), 100,  new Lambertian(vec3(0.0, 0.1, 0.0)));
-    list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new      Metal(vec3(0.8, 0.6, 0.2), 0.6));
-    list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new      Metal(vec3(0.8, 0.8, 0.8), 0.9));
+    list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new Metal(vec3(0.8, 0.6, 0.2), 0.6));
+    list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new Metal(vec3(0.8, 0.8, 0.8), 0.9));
     Hitable* world = new HitableList(list, 4);
 
     Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(texWidth) / float(texHeight));
