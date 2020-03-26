@@ -17,6 +17,7 @@
 #include"Rect.h"
 //#include"AABB.h"
 #include"Texture.h"
+#include"Box.h"
 
 
 using namespace std;
@@ -64,14 +65,19 @@ vec3 random_in_sphere() {
 
 vec3 color(const ray& r, Hitable* world, int depth) {
     hit_record rec;
-    if (world->hit(r, 0.001, MAXFLOAT, rec)) {
-        ray scattered; // 散射后的光线
-        vec3 attenuation; // 衰减
-        if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-            return attenuation * color(scattered, world, depth + 1);
+    if (world->hit(r, 0.01, MAXFLOAT, rec)) {
+        // 散射后的光线
+        ray scattered;
+        // 衰减
+        vec3 attenuation;
+        // 记录自发光的颜色
+        vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+        if (depth < 10 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+            // 递归 衰减
+            return emitted + attenuation * color(scattered, world, depth + 1);
         }
         else {
-            return vec3(0, 0, 0);
+            return emitted;
         }
     }
     //if (world->hit(r, 0.0, MAXFLOAT, rec)) {
@@ -123,31 +129,6 @@ static int update(void *ptr)
             }
         }
 
-        // splat down some random pixels
-        //for (unsigned int i = 0; i < 1000; i++)
-        //{
-        //    const unsigned int x = rand() % texWidth;
-        //    const unsigned int y = rand() % texHeight;
-
-        //    const unsigned int offset = (texWidth * 4 * y) + x * 4;
-        //    pixels[offset + 0] = rand() % 256;        // b
-        //    pixels[offset + 1] = rand() % 256;        // g
-        //    pixels[offset + 2] = rand() % 256;        // r
-        //    pixels[offset + 3] = SDL_ALPHA_OPAQUE;    // a
-        //}
-
-        //unsigned char* lockedPixels;
-        //int pitch;
-        //SDL_LockTexture
-        //    (
-        //    texture,
-        //    NULL,
-        //    reinterpret_cast< void** >( &lockedPixels ),
-        //    &pitch
-        //    );
-        //std::copy( pixels.begin(), pixels.end(), lockedPixels );
-        //SDL_UnlockTexture( texture );
-
         SDL_UpdateTexture(s_texture, NULL, &pixels[0], texWidth * 4);
 
         SDL_RenderCopy(renderer, s_texture, NULL, NULL);
@@ -169,13 +150,19 @@ Hitable* cornell_box() {
     Material* red = new Lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
     Material* white = new Lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
     Material* green = new Lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
-    Material* light = new DiffuseLight(new constant_texture(vec3(15, 15, 15)));
+    Material* light = new DiffuseLight(new constant_texture(vec3(1, 1, 1)));
+
+    //Material* g
     list[i++] = new flip_normals(new yz_rect(0, 555, 0, 555, 555, green));
     list[i++] = new yz_rect(0, 555, 0, 555, 0, red);
     list[i++] = new xz_rect(213, 343, 227, 332, 554, light);
     list[i++] = new flip_normals(new xz_rect(0, 555, 0, 555, 555, white));
     list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
     list[i++] = new flip_normals(new xy_rect(0, 555, 0, 555, 555, white));
+
+    //box
+    list[i++] = new translate(new rotate_y(new Box(vec3(0, 0, 0), vec3(165, 165, 165), white), -18), vec3(130, 0, 65));
+    list[i++] = new translate(new rotate_y(new Box(vec3(0, 0, 0), vec3(165, 330, 165), white), 15), vec3(265, 0, 295));
 
     return new HitableList(list, i);
 }
@@ -191,8 +178,8 @@ int main(int argc, char** argv)
     ////////////////////
 
     int const xsize = texWidth, ysize = texHeight;
-    int const ns = 1;
-    int const nss = 100;
+    int const ns = 1; //内循环采样次数
+    int const nss = 100; //外循环迭代次数
     uint8_t* p = pixels;
     //unsigned char rgb[xsize * ysize * 3], * p = rgb;
     unsigned x, y;
@@ -202,11 +189,6 @@ int main(int argc, char** argv)
     vec3 vertical(0.0, 2.0, 0.0);
     vec3 origin(0.0, 0.0, 0.0);
 
-    //Hitable* list[4];
-    //list[0] = new sphere(vec3( 0,      0, -1), 0.5,  new Lambertian(vec3(0.0, 0.3, 0.3)));
-    //list[1] = new sphere(vec3( 0, -100.5, -1), 100,  new Lambertian(vec3(0.0, 0.1, 0.0)));
-    //list[2] = new sphere(vec3( 1,      0, -1), 0.5,  new Metal(vec3(0.8, 0.6, 0.2), 0.6));
-    //list[3] = new sphere(vec3(-0.88,-0.1, -1), 0.4,  new Metal(vec3(0.8, 0.8, 0.8), 0.9));
     Hitable* world = cornell_box();
     
     vec3 lookfrom(278, 278, -700);

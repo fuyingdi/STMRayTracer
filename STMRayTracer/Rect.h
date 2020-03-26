@@ -1,9 +1,5 @@
 #pragma once
 
-
-#ifndef PETER_SHIRLEY_PROJECT_CODE_AARECT_H
-#define PETER_SHIRLEY_PROJECT_CODE_AARECT_H
-
 #include "hitable.h"
 
 // xy平面的矩形
@@ -101,4 +97,4 @@ bool yz_rect::hit(const ray& r, float t0, float t1, hit_record& rec) const {
     return true;
 }
 
-#endif //PETER_SHIRLEY_PROJECT_CODE_AARECT_H
+#pragma once

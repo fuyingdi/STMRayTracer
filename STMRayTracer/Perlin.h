@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef PETER_SHIRLEY_PROJECT_CODE_PERLIN_H
-#define PETER_SHIRLEY_PROJECT_CODE_PERLIN_H
 
 #include "vec3.h"
 
@@ -124,4 +122,3 @@ int* perlin::perm_y = perlin_generate_perm();
 int* perlin::perm_z = perlin_generate_perm();
 
 
-#endif //PETER_SHIRLEY_PROJECT_CODE_PERLIN_H
