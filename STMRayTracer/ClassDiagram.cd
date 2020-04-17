@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="aabb" Collapsed="true">
+    <Position X="24" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAIgAAAAAABAAAAAAAAAAAEABAAAAAAAA=</HashCode>
+      <FileName>AABB.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Box">
+    <Position X="10.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAgAACAAAAAAAAAIAQAAAAAAAAAAAACA=</HashCode>
+      <FileName>Box.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Camera">
+    <Position X="12.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAACAEAAAAAAAAABAAAAAAAAAAACAABAAAAAAAAAAAA=</HashCode>
+      <FileName>camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hitable" Collapsed="true">
+    <Position X="11.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>hitable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="flip_normals" Collapsed="true">
+    <Position X="19.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAgAACAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>hitable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="bvh_node" Collapsed="true">
+    <Position X="2" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAACBAAAgAAAAAIAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>hitable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="translate" Collapsed="true">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAgAACAAAAAAAAAAAAEAAAAAAAAAABAA=</HashCode>
+      <FileName>hitable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="rotate_y" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAFAAAAgAADAAAAAABAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>hitable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HitableList">
+    <Position X="13.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAgAACAAAAQAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>hitable_list.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Material" Collapsed="true">
+    <Position X="4" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lambertian">
+    <Position X="6.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQEAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Metal">
+    <Position X="1.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQEAAAAAAAAAAAAAAgAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Dielectric">
+    <Position X="3.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAAAAAAAAAACACAAAAAAAAAA=</HashCode>
+      <FileName>Material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiffuseLight">
+    <Position X="4.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAEAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="perlin" Collapsed="true">
+    <Position X="27.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAQAAAAgAAAAAAAAAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Perlin.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ray">
+    <Position X="8.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAABAAAIAAAgIAAAAAAAAAAAAAAAAAAAAEAAIAEAAAA=</HashCode>
+      <FileName>ray.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="xy_rect" Collapsed="true">
+    <Position X="6.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAgAACAAAAAAAAABgAACAgQACAAAAAAA=</HashCode>
+      <FileName>Rect.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="xz_rect" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAACAAAAAAAACBAAQCggAACAAAAAAA=</HashCode>
+      <FileName>Rect.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="yz_rect" Collapsed="true">
+    <Position X="9.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAACAAAAAAAABAgAQAggQACAAAAAAA=</HashCode>
+      <FileName>Rect.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="sphere">
+    <Position X="12.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAACAAABgAACACAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Sphere.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="texture" Collapsed="true">
+    <Position X="4" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="constant_texture" Collapsed="true">
+    <Position X="4" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAAAAAACCAAAAAAAAAAAA=</HashCode>
+      <FileName>Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checker_texture" Collapsed="true">
+    <Position X="5.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAEAAAAAAACAAAAAAAACAAAA=</HashCode>
+      <FileName>Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="noise_texture" Collapsed="true">
+    <Position X="2.5" Y="8.75" Width="1.5" />
+    <InheritanceLine Type="texture" FixedFromPoint="true">
+      <Path>
+        <Point X="4.75" Y="7.798" />
+        <Point X="4.75" Y="8.375" />
+        <Point X="3.25" Y="8.375" />
+        <Point X="3.25" Y="8.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAEAAAgAAAAAAAAAAAAAAAACAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="vec3">
+    <Position X="10.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAAEAAAQgAAAEAAAAKAQBhIQAAAAA=</HashCode>
+      <FileName>vec3.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="hit_record" Collapsed="true">
+    <Position X="24" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAgAAAAAAAAAAFYAAAAAAAA=</HashCode>
+      <FileName>hitable.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

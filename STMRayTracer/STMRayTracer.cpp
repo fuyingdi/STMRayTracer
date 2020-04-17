@@ -65,18 +65,19 @@ vec3 random_in_sphere() {
 
 vec3 color(const ray& r, Hitable* world, int depth) {
     hit_record rec;
-    if (world->hit(r, 0.01, MAXFLOAT, rec)) {
+    if (world->hit(r, 0.001, MAXFLOAT, rec)) {
         // 散射后的光线
         ray scattered;
         // 衰减
         vec3 attenuation;
         // 记录自发光的颜色
         vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-        if (depth < 10 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+        if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
             // 递归 衰减
             return emitted + attenuation * color(scattered, world, depth + 1);
         }
-        else {
+        else
+        {
             return emitted;
         }
     }
@@ -150,7 +151,14 @@ Hitable* cornell_box() {
     Material* red = new Lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
     Material* white = new Lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
     Material* green = new Lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
-    Material* light = new DiffuseLight(new constant_texture(vec3(1, 1, 1)));
+    Material* light = new DiffuseLight(new constant_texture(vec3(1, 1, 150)));
+    
+    Material* gloss = new Dielectric(0.75f);
+    Material* gloss2 = new Dielectric(0.95f);
+
+    Material* gold = new Metal(vec3(0.8, 0.6, 0.2), 0.75f);
+    Material* silver = new Metal(vec3(0.8, 0.8, 0.8), 0.35f);
+    Material* iron = new Metal(vec3(0.8, 0.8, 0.8),0.1f);
 
     //Material* g
     list[i++] = new flip_normals(new yz_rect(0, 555, 0, 555, 555, green));
@@ -159,10 +167,15 @@ Hitable* cornell_box() {
     list[i++] = new flip_normals(new xz_rect(0, 555, 0, 555, 555, white));
     list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
     list[i++] = new flip_normals(new xy_rect(0, 555, 0, 555, 555, white));
+    //list[i++] = new xy_rect(0, 555, 0, 955, 0, red);
 
     //box
-    list[i++] = new translate(new rotate_y(new Box(vec3(0, 0, 0), vec3(165, 165, 165), white), -18), vec3(130, 0, 65));
-    list[i++] = new translate(new rotate_y(new Box(vec3(0, 0, 0), vec3(165, 330, 165), white), 15), vec3(265, 0, 295));
+    //list[i++] = new translate(new rotate_y(new Box(vec3(0, 0, 0), vec3(165, 165, 165), white), -18), vec3(130, 0, 65));
+    //list[i++] = new translate(new rotate_y(new Box(vec3(0, 0, 0), vec3(165, 330, 165), white), 15), vec3(265, 0, 295));
+    
+    //sphere
+    list[i++] = new sphere(vec3(150, 90, 150), 90, gloss2);
+    list[i++] = new sphere(vec3(350, 130, 350), 130, iron);
 
     return new HitableList(list, i);
 }
@@ -230,6 +243,7 @@ int main(int argc, char** argv)
         svpng(fp, xsize, ysize, pixels, 0);
         fclose(fp);*/
     }
+    system("pause");
 
     return 1;
 }
