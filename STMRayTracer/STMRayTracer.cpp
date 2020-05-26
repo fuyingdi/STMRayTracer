@@ -115,7 +115,7 @@ static int update(void *ptr)
     while (1)
     {
         Sleep(16);
-        if (!update_flag)continue;
+        if (false&&!update_flag)continue;
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
@@ -144,6 +144,40 @@ static int update(void *ptr)
     }
     return 0;
 }
+//Hitable* random_scene() {
+//    int n = 500;
+//    Hitable** list = new Hitable * [n + 1];
+//    list[0] = new sphere(vec3(0, -700, 0), 700, new Lambertian(vec3(0.5, 0.5, 0.5)));
+//    int i = 1;
+//    for (int a = -11; a < 11; a++) {
+//        for (int b = -11; b < 11; b++) {
+//            float choose_mat = drand48();
+//            vec3 center(a + 0.9 * drand48(), 0.2, b + 0.9 * drand48());
+//            if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
+//                if (choose_mat < 0.8) {  // diffuse
+//                    // 运动模糊的小球
+//                    list[i++] = new sphere(center, 40,
+//                        new Lambertian(new constant_texture(vec3(drand48() * drand48(), drand48() * drand48(),
+//                            drand48() * drand48()))));
+//                }
+//                else if (choose_mat < 0.95) { // metal
+//                    list[i++] = new sphere(center, 0.2,
+//                        new Metal(vec3(0.5 * (1 + drand48()), 0.5 * (1 + drand48()),
+//                            0.5 * (1 + drand48())), 0.5 * drand48()));
+//                }
+//                else {  // glass
+//                    list[i++] = new sphere(center, 0.2, new Dielectric(1.5));
+//                }
+//            }
+//        }
+//    }
+//
+//    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new Dielectric(2.5));
+//    list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new Lambertian(vec3(0.4, 0.2, 0.1)));
+//    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new Metal(vec3(1, 1, 1), 0.0));
+//
+//    return new HitableList(list, i);
+//}
 
 Hitable* cornell_box() {
     Hitable** list = new Hitable * [8];
@@ -151,7 +185,7 @@ Hitable* cornell_box() {
     Material* red = new Lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
     Material* white = new Lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
     Material* green = new Lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
-    Material* light = new DiffuseLight(new constant_texture(vec3(1, 1, 150)));
+    Material* light = new DiffuseLight(new constant_texture(vec3(100, 100, 100)));
     
     Material* gloss = new Dielectric(0.75f);
     Material* gloss2 = new Dielectric(0.95f);
@@ -176,6 +210,30 @@ Hitable* cornell_box() {
     //sphere
     list[i++] = new sphere(vec3(150, 90, 150), 90, gloss2);
     list[i++] = new sphere(vec3(350, 130, 350), 130, iron);
+
+    return new HitableList(list, i);
+}
+Hitable* test1() {
+    Hitable** list = new Hitable * [4];
+    int i = 0;
+    Material* red = new Lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
+    Material* white = new Lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
+    Material* green = new Lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
+    Material* light = new DiffuseLight(new constant_texture(vec3(100, 100, 100)));
+
+    Material* gloss = new Dielectric(0.75f);
+    Material* gloss2 = new Dielectric(0.95f);
+
+    Material* gold = new Metal(vec3(0.8, 0.6, 0.2), 0.75f);
+    Material* silver = new Metal(vec3(0.8, 0.8, 0.8), 0.35f);
+    Material* iron = new Metal(vec3(0.8, 0.8, 0.8), 0.1f);
+
+    //Material* g
+    list[0] = new sphere(vec3(0, 0, -1), 0.5, white);
+    list[1] = new sphere(vec3(0, -100.5, -1), 100, white);
+    list[2] = new sphere(vec3(1, 0, -1), 0.5, white);
+    list[3] = new sphere(vec3(-1, 0, -1), 0.5, white);
+    
 
     return new HitableList(list, i);
 }
@@ -209,7 +267,7 @@ int main(int argc, char** argv)
     float dist_to_focus = 10.0;
     float aperture = 0.1;
     float vfov = 40.0;
-    Camera cam(lookfrom, lookat, vec3(0, 1, 0), vfov, float(xsize) / float(ysize));
+    Camera cam(lookfrom, lookat, vec3(0, 100, 0), vfov, float(xsize) / float(ysize));
     //Camera cam(vec3(0, 0, 2.2), vec3(0, 0, 0), vec3(0, 1, 0), 30, float(texWidth) / float(texHeight));
 
     for (int ii = 0; ii < nss; ii++)
